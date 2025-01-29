@@ -1,0 +1,193 @@
+\subsection{Pure Python Implementation}
+The pure Python implementation focuses on clarity and maintainability. 
+The functionality of the package is implemented in a base class called Dual.
+The Dual class takes two arguments: the real and the dual component, 
+which is then passed to the Dual object to be used to perform the operations.
+
+\begin{lstlisting}[language=Python]
+class Dual:
+    def __init__(self, real, dual=0.0):
+        self.real = real
+        self.dual = dual
+\end{lstlisting}
+
+Basic operations such as addition, subtraction, multiplication, division, and indices are implemented as methods of the Dual class. 
+These operations were overloaded over standard symbols such as $+$, $-$, $*$, $/$, and $**$.
+The reverse operators (for when the Dual class is on the right-hand side of the operator), were also defined for completeness. 
+In the case of a Dual number and a non-Dual number, the operator will turn the non-Dual number into a Dual number, 
+with a Dual component of 0. The operations will always return a Dual object. 
+
+An example of overloading the $+$ operator:
+
+\begin{lstlisting}[language=Python]
+    def __add__(self, other) -> "Dual":
+    # Check if the other object is a Dual number
+    if not isinstance(other, Dual):
+        other = Dual(other)
+    return Dual(self.real + other.real, self.dual + other.dual)
+\end{lstlisting}
+
+For two dual numbers: $a + b\epsilon$, $c + d\epsilon$, the following mathematical operations were defined:
+
+\subsubsection{Addition}
+Addition is simply just the addition of the real and Dual components.
+
+\begin{equation}
+    (a + b\epsilon) + (c + d\epsilon) = (a + c) + (b + d)\epsilon
+    \label{eq:addition}
+    \end{equation}
+
+\subsubsection{Subtraction}
+Subtraction is simply the subtraction of the real and Dual components.
+
+\begin{equation}
+    (a + b\epsilon) - (c + d\epsilon) = (a - c) + (b - d)\epsilon
+    \label{eq:subtraction}
+    \end{equation}
+
+\subsubsection{Multiplication}
+Multiplication of two dual numbers involves multiplying the real parts and applying the distributive property to the dual parts:
+
+\begin{equation}
+    (a + b\epsilon) \times (c + d\epsilon) = (a \times c) + (a \times d + b \times c)\epsilon
+    \label{eq:multiplication}
+    \end{equation}
+
+\subsubsection{Division}
+Division of two dual numbers involves dividing the real parts and applying the quotient rule to the dual parts:
+
+\begin{equation}
+    \frac{a + b\epsilon}{c + d\epsilon} = \frac{a}{c} + \frac{b \times c - a \times d}{c^2}\epsilon
+    \label{eq:division}
+\end{equation}
+
+\subsubsection{Exponentiation}
+Raising a dual number to the power of another dual number involves using the chain rule and logarithmic identities:
+
+\begin{equation}
+    (a + b\epsilon)^{(c + d\epsilon)} = a^c \left(1 + \left(\frac{b \cdot c}{a} + d \cdot \ln(a)\right)\epsilon\right)
+    \label{eq:exponentiation}
+\end{equation}
+
+A number of useful functions were also added to the base Dual class:
+
+\subsubsection{Sine Function}
+The sine of a dual number is calculated by applying the sine function to the real part and the cosine function to the dual part:
+
+\begin{equation}
+    \sin(a + b\epsilon) = \sin(a) + b \cdot \cos(a)\epsilon
+    \label{eq:sine}
+\end{equation}
+
+\subsubsection{Cosine Function}
+The cosine of a dual number is calculated by applying the cosine function to the real part and the negative sine function to the dual part:
+
+\begin{equation}
+    \cos(a + b\epsilon) = \cos(a) - b \cdot \sin(a)\epsilon
+    \label{eq:cosine}
+\end{equation}
+
+\subsubsection{Tangent Function}
+The tangent of a dual number is calculated by applying the tangent function to the real part and the derivative of the tangent function to the dual part:
+
+\begin{equation}
+    \tan(a + b\epsilon) = \tan(a) + b \cdot \sec^2(a)\epsilon
+    \label{eq:tangent}
+\end{equation}
+
+\subsubsection{Logarithm Function}
+The logarithm of a dual number is calculated by applying the logarithm function to the real part and dividing the dual part by the real part:
+
+\begin{equation}
+    \log(a + b\epsilon) = \log(a) + \frac{b}{a}\epsilon
+    \label{eq:logarithm}
+\end{equation}
+
+\subsubsection{Exponential Function}
+The exponential of a dual number is calculated by applying the exponential function to the real part and multiplying the dual part by the exponential of the real part:
+
+\begin{equation}
+    e^{(a + b\epsilon)} = e^a \left(1 + b\epsilon\right)
+    \label{eq:exponential}
+\end{equation}
+
+\subsubsection{Differentiation}
+The crucial use of Dual numbers is in being able to efficiently calculate the exact derivative of a function at a certain point.
+Given a function: $f(x)$, the derivative at point $x_0$ is calculated with Dual numbers in the following way:
+
+Expand $f(x_0 + \epsilon)$ using a Taylor Expansion
+
+\begin{equation}
+    f(x_0 + \epsilon) = f(x_0) + f'(x_0) \epsilon + \frac{f''(x_0)}{2} \epsilon^2 \dots
+    \label{eq:taylor_exp}
+\end{equation}
+
+Since $\epsilon^2 = 0$, all of the higher order terms vanish leaving:
+
+\begin{equation}
+    f(x_0 + \epsilon) = f(x_0) + f'(x_0) \epsilon
+    \label{eq:taylor_exp_no_higher}
+\end{equation}
+
+Therefore, the derivative of $f(x)$ at point $x_0$ is the coefficient of the dual part of the result, 
+$f'(x_0) \epsilon$
+
+\subsection{Cythonised Implementation}
+Cythonisation is the process of compiling Python code in C, 
+which can significantly speed-up execution, especially for numerical computations and loops. \\
+
+A separate module called \texttt{dual\_autodiff\_x} was created for the Cython code, 
+where a new base class was created (\texttt{dual.pyx}), with the exact same functionality as the pure Python package.
+In this base class, static type declaration was performed for the class and its functions.
+
+\begin{lstlisting}[language=Python]
+cdef class Dual:
+    cdef public double real
+    cdef public double dual
+    
+    def __init__(self, double real, double dual=0.0):
+        self.real = real
+        self.dual = dual
+\end{lstlisting}
+
+The Cythonisation of the code was performed using the \texttt{Cython} 
+library for the build process (compiling the \texttt{dual.c} file)
+
+\subsection{Build System and Packaging}
+\subsubsection{Packaging}
+To perform the setup for the package, a \texttt{pyproject.toml} was included the code. 
+It contains all of the project information, dependencies, 
+and tools for automatic versioning, and packaging. 
+It allows the package to be installed on any environment by running 
+\texttt{pip install -e} from the root folder of the module.  
+The Cythonised package had its own \texttt{pyproject.toml} and \texttt{setup} file, 
+so that it could be installed as a standalone package if required by the user. 
+
+\subsubsection{Git, CI/CD and Test Suite}
+For integration with Git, and to perform Continuous Integration and Continuous Development (CI/CD),
+the package comes fully tested (testing both valid and invalid inputs). This test suite prevents incorrect changes to the code. 
+This is integrated by creating a automatic pre-commit git hook. 
+Automatic versioning is also implemented, where the version is updated for every push to the main branch.
+Due to the package structure, the \texttt{dual\_autodiff\_x} does not have automatic versioning,
+as it would require a fully-built Git repo, which would lead to a Git repo within a Git repo.
+
+\subsubsection{Compiling Cython Wheels}
+\texttt{cibuildwheel} was used to create the wheels for specific Linux and Python (3.10, 3.11) installations using different Docker images. 
+Wheels offer many benefits, including pre-compiling binaries (removing the need for compiliers on machines), 
+faster installation, and dependency management. It is especially necessary for Cythonsied code, to have separate
+wheels as the compilers found on Linux, OSX, and Windows laptops can be different. 
+Without the necessary wheels, the C code will not compile. 
+The \texttt{.pyx} (source code) was excluded from the wheels, following good practice. 
+
+\subsubsection{Documentation}
+Documentation is vital for users to understand how the package works, and should always be up to date.
+In this sense, the ability to automatically update documentation whenever there is a change to code is useful. 
+This is implemented using the \texttt{Sphinx} library, which detects the fully documented (type-hinting and docstrings)
+within the code, and outputs them to a \texttt{.html} file within the \texttt{docs/build} folder.  
+Jupyter notebooks are also integrated into the documentation using the \texttt{pandoc} extension. 
+By running \texttt{make html} from the root directory, the all necessary dependencies are installed, 
+and the documentation is built.
+The dependencies for documentation are not included in the wheels or pyproject.toml file, 
+as they are not necessary for the package to run.
+An improvement would be to create another Git commit hook to update the documentation when changes are mode to the code. 
+

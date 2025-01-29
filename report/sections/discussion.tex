@@ -1,0 +1,67 @@
+\subsection{Automatic Differentiation vs. Numerical Differentiation}
+As shown by Figure \ref{fig:diff_demo}, numerical differentiation heavily depends on the step size given,
+and theoretically can never find the true solution (as step size must be finite). 
+Automatic Differentiation, however, finds the exact solution, which is incredibly useful. 
+In practice however, with a small enough step-size, the numerical differentiation will reach the solution
+to within floating-point error, which is the same as any method was achieved. Also, the differentiation method
+used was central difference, which is a relatively crude method compared to the methods available today. \\
+
+The primary use of Automatic Differentiation would be in machine learning (especially important for the back-propagation process for neural networks), 
+and that should be the context in which we evaluate the different methods. 
+In terms of implementation, numerical differentiation step-size would effectively become 
+a hyperparameter, where the goal would be to make it as small as possible. Without a sufficiently small enough step-size, 
+the differentiation would be inaccurate, and propagate the errors to the learning process, leading to ineffective learning.
+Also, central differences in higher dimensions is computationally expensive, which is an issue for modern neural networks. \\
+
+In terms of performance the numerical differentiation is faster than the automatic differentiation, as it is a simpler method, 
+but the negatives of numerical differentiation outweigh the positives for the specific use case of machine learning.
+
+
+\subsection{Python vs. Cython Trade-offs}
+
+\subsubsection{Development Complexity}
+The Cythonized implementation introduces additional complexity, requiring: separate build process, platform-specific compilation (wheels), and increased maintenance overhead.
+
+\subsubsection{Performance Benefits}
+For use in machine learning, the reduced memory usage of Cython is extremely useful, as models get larger.
+However, the memory usage for derivatives show no improvement, which is the most critical use of Dual numbers.
+In Figure~\ref{fig:basic_ops_memory}, the memory usage for derivatives is the same as the Python implementation,
+which implies that the C optimization may not be as impactful as the amount of data being processed overshadows the memory optimizations. 
+In terms of speed, Cython makes a noticeable improvement, especially for large numbers of operations, which is useful for machine learning.
+This is likely due to Cython's optimisations for running loops and computations, 
+but the difference is negligible when the number of operations is small. 
+The performance improvements justify the added complexity. 
+
+\subsection{Computational Efficiency}
+
+The operations on Dual numbers have constant time complexity:
+
+\begin{itemize}
+    \item Addition/Subtraction: $O(1)$ - requires two basic arithmetic operations
+    \item Multiplication: $O(1)$ - requires three multiplications and one addition
+    \item Division: $O(1)$ - requires three divisions, one multiplication, and one subtraction
+    \item Elementary Functions: $O(1)$ - requires evaluation of the function and its derivative at a point
+\end{itemize}
+
+This constant-time complexity makes Dual numbers particularly efficient for automatic differentiation, as the computational cost of each operation remains bounded regardless of the complexity of the expression being differentiated.
+The constant-time complexity ($O(1)$) of Dual number operations represents a significant advantage over alternative differentiation methods. 
+This efficiency stems from the elegant mathematical properties of dual numbers, where $\epsilon^2 = 0$ eliminates the need for higher-order terms in calculations. \\
+
+When compared to other differentiation methods:
+\begin{itemize}
+    \item \textbf{Numerical Differentiation:} Requires multiple function evaluations for finite differences and can suffer from round-off errors and step-size sensitivity.
+    \item \textbf{Dual Numbers:} Maintains constant-time complexity regardless of function complexity, with exact derivatives computed alongside function evaluation.
+\end{itemize}
+
+This efficiency is particularly valuable in machine learning applications, where gradient computations are 
+performed repeatedly during optimization. 
+The Cythonized implementation further enhances this advantage by reducing the overhead of Python's dynamic typing, 
+resulting in performance approaching that of pure C implementations while maintaining the convenience of Python's syntax.
+
+\subsection{Future Work}
+To build on this package, futher improvements include: 
+an implementation of reverse-mode differentiation, which is more efficient for nested functions. 
+This would allow for more complex models to be differentiated, and would be a significant improvement for machine learning.
+Extended support for complex mathematical functions, such as inverse trigonometric functions, 
+which are not currently supported. Support for multivariate dual numbers and operations.
+More comprehensive testing and documentation, such as linting, code coverage and type hinting

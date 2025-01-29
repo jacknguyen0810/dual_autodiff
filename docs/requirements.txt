@@ -1,0 +1,11 @@
+sphinx
+sphinx-rtd-theme
+sphinx-autodoc-typehints
+nbsphinx
+sphinx-gallery
+recommonmark
+ipykernel
+matplotlib
+numpy
+pypandoc
+pandoc

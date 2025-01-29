@@ -1,0 +1,15 @@
+The concept of automatic differentiation (AD) has become increasingly important in modern scientific computing, 
+particularly in machine learning and optimization. Dual numbers, an extension of real numbers that include an 
+infinitesimal component, provide an elegant approach to implementing forward-mode automatic differentiation.
+
+The goal of this project is to implement a dual number system in pure Python and optimize performance through Cythonization. 
+We will compare the performance characteristics of the two implementations and analyze the trade-offs between 
+implementation approaches. These techniques are packaged in a Python package following coding good practices.
+
+\subsection{Background}
+Dual numbers, introduced by William Clifford \cite{clifford1873}, extend real numbers by adding a nilpotent element 
+$\epsilon$ with the property $\epsilon^2 = 0$. A dual number takes the form:
+
+ $a + b\epsilon$, 
+
+where $a$ represents the real part and $b$ represents the dual part.
