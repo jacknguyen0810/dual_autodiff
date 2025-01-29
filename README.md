@@ -78,24 +78,3 @@ Contributions are welcome! Please open an issue or submit a pull request.
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
-
-## Declaration of Auto-generative AI Tools
-
-This project was developed with the help of the following auto-generative AI tools:
-
-- Claude 3.5 Sonnet and GPT-4o
-
-### Declaration of the Use of Autogenerative AI Tools
-All algorithms and techniques were implemented independently. 
-
-LLMs were used to help with: 
--Plotting Assistance
-- Debugging assistance due to errors in the code
-
-In particular, I used GPT-4o to help with the Sphinx and automatic documentation generation, when the html files were not being generated. 
-
-**Example of GPT-4o usage:**
-- I have the following error: ..., can you help me fix it?
-- I have generated the following results, ..., how best should I best plot this?
-
-# dual_autodiff
